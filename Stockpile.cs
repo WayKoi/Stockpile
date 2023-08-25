@@ -106,7 +106,7 @@ namespace Piles {
 			List<string> chunks = ChunkData(content);
 
 			foreach (string chunk in chunks) {
-				Pile? point = LoadCoin(chunk);
+				Pile? point = LoadPile(chunk);
 				if (point == null) { continue; }
 				file.AddToCollection(point);
 			}
@@ -158,7 +158,7 @@ namespace Piles {
 			return chunks;
 		}
 
-		protected static Pile? LoadCoin(string content) {
+		protected static Pile? LoadPile(string content) {
 			string[] split = content.Split(new string[] { ": " }, 2, StringSplitOptions.None);
 			if (split.Length < 2) { return null; }
 			Pile val = new Pile(split[0]);
@@ -214,7 +214,7 @@ namespace Piles {
 			if (point[0] == '{') {
 				List<string> chunks = ChunkData(point.Remove(point.Length - 1, 1).Remove(0, 1));
 				foreach (string chunk in chunks) {
-					Pile? coin = LoadCoin(chunk);
+					Pile? coin = LoadPile(chunk);
 					if (coin == null) { continue; }
 					val.AddToCollection(coin);
 				}

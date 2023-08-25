@@ -1,7 +1,7 @@
 Moon: ["test", {
-	Size: 20;
+	Size: 50;
 	Name: "Luna";
 	Material: {
-		Density: 100;
+		Density: 202020;
 	};
 }];

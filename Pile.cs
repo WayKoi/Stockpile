@@ -136,6 +136,7 @@ namespace Piles {
 		public void ClearCollection() { Collection.Clear(); }
 
 		public void AddToCollection(Pile val) {
+			if (val == null) { return; }
 			if (!Collection.ContainsKey(val.Handle)) {
 				Collection.Add(val.Handle, new List<Pile>());
 			}
@@ -186,11 +187,11 @@ namespace Piles {
 
 			if (Collection.Count > 0) {
 				string sub = (count > 0 ? ", " : "") + "{\n\t";
-				// build += 
 
 				bool append = false;
 				List<string> collections = new List<string>();
 				foreach (KeyValuePair<string, List<Pile>> key in Collection) {
+					if (key.Value == null) { continue; }
 					foreach (Pile val in key.Value) {
 						if (val != null) {
 							collections.Add(val.ToString());
@@ -207,9 +208,8 @@ namespace Piles {
 
 				if (append) {
 					build += sub;
+					count++;
 				}
-
-				count++;
 			}
 
 			if (count > 1) {
