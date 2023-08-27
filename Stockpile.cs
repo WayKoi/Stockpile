@@ -1,13 +1,21 @@
-﻿using System;
+﻿using Piles.Utility;
+using Piles.Versioning;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.Serialization;
 using System.Text;
 using System.Threading.Tasks;
+using System.Web;
 
 namespace Piles {
 	public class Stockpile {
 		public string Path { get; set; } = string.Empty;
+		public string FileName { get; set; } = string.Empty;
+		public string FileExtension { get; set; } = string.Empty;
+		public Ver Version { get; set; } = new Ver();
+		public bool HasVersion { get; protected set; } = true;
+
 		protected Dictionary<string, List<Pile>> Collection = new Dictionary<string, List<Pile>>();
 
 		public Stockpile (string? path = null) {
@@ -55,6 +63,10 @@ namespace Piles {
 		public override string ToString() {
 			List<string> vals = new List<string>();
 
+			if (HasVersion) {
+				vals.Add(string.Format("Version: \"{0}.{1}.{2}\";\n", Version.Major, Version.Minor, Version.Patch));
+			}
+
 			foreach (KeyValuePair<string, List<Pile>> pair in Collection) {
 				foreach (Pile val in pair.Value) { 
 					string? add = val.ToString();
@@ -63,13 +75,11 @@ namespace Piles {
 				}
 			}
 
-			return String.Join("", vals);
+			return string.Join("", vals);
 		}
 
 		public void Save (string? path = null) {
-			if (path == null) {
-				path = Path;
-			}
+			path = GetFullPath(path);
 
 			if (path == string.Empty) { return; }
 			if (!File.Exists(path)) {
@@ -78,6 +88,11 @@ namespace Piles {
 			}
 
 			File.WriteAllText(path, ToString());
+		}
+
+		public string GetFullPath (string? path) {
+			if (path == null) { path = Path; }
+			return string.Format("{0}/{1}.{2}", path, FileName, FileExtension);
 		}
 
 		// ----------------------------------------------
@@ -96,11 +111,14 @@ namespace Piles {
 			return handle;
 		}
 
-		public static Stockpile Load(string path) {
+		public static Stockpile Load(string path, bool versioned = true) {
 			Stockpile file = new Stockpile();
 			if (!File.Exists(path)) { return file; }
 
-			file.Path = path;
+			file.Path = IO.GetFilePath(path);
+			file.FileName = IO.GetFileName(path);
+			file.FileExtension = IO.GetFileExtension(path);
+
 			string content = File.ReadAllText(path);
 			content = content.Replace("\n", "").Replace("\t", "").Replace("\r", "");
 			List<string> chunks = ChunkData(content);
@@ -109,6 +127,23 @@ namespace Piles {
 				Pile? point = LoadPile(chunk);
 				if (point == null) { continue; }
 				file.AddToCollection(point);
+			}
+
+			file.HasVersion = versioned;
+			if (versioned) {
+				Pile point = file.TopProperty("Version");
+				string top = point.TopStringDefault("0.0.0");
+				string[] segs = top.Split('.');
+
+				if (segs.Length == 3) {
+					int major = 0, minor = 0, patch = 0;
+					int.TryParse(segs[0], out major);
+					int.TryParse(segs[1], out minor);
+					int.TryParse(segs[2], out patch);
+					file.Version.Set( (major, minor, patch));
+				}
+
+				file.RemoveFromCollection(point);
 			}
 
 			return file;

@@ -1,7 +1,8 @@
+Version: "1.0.0";
 Moon: ["test", {
-	Size: 50;
-	Name: "Luna";
+	Size: 20;
+	Name: "updated";
 	Material: {
-		Density: 202020;
+		Density: 100;
 	};
 }];
