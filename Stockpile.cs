@@ -14,7 +14,7 @@ namespace Piles {
 		public string FileName { get; set; } = string.Empty;
 		public string FileExtension { get; set; } = string.Empty;
 		public Ver Version { get; set; } = new Ver();
-		public bool HasVersion { get; protected set; } = true;
+		public bool HasVersion { get; set; } = true;
 
 		protected Dictionary<string, List<Pile>> Collection = new Dictionary<string, List<Pile>>();
 
