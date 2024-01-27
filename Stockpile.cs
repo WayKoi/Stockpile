@@ -102,6 +102,8 @@ namespace Piles {
 		public static string StandardizeHandle(string handle) {
 			if (handle.Equals("")) { handle = "None"; return handle; }
 
+			handle = handle.Trim();
+
 			foreach (char single in BannedHandleChars) {
 				handle = handle.Replace(single + "", "");
 			}
