@@ -1,8 +1,0 @@
-Version: "1.0.0";
-Moon: ["test", {
-	Size: 20;
-	Name: "updated";
-	Material: {
-		Density: 100;
-	};
-}];
