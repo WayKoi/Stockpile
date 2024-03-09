@@ -1,6 +1,6 @@
 ﻿using Piles;
 using Piles.Versioning;
-using Stockpile.DataFiles;
+using Piles.DataFiles;
 
 string path = Directory.GetCurrentDirectory() + "\\test.stp";
 
@@ -11,11 +11,11 @@ StockVersion.Connect(
 	new ((int, int, int), (int, int, int), Func<Stockpile, Stockpile>)[] {
 		((0, 0, 0), (1, 0, 0), Updatever2)
 	}
-);*/
+);
 
 // StockVersion.Update(pile, (1, 0, 0));
 
-/*Pile point = pile.TopProperty("Moon");
+Pile point = pile.TopProperty("Moon");
 point.TopString = "test";
 Pile sub = point.TopProperty("Size");
 double size = sub.TopDoubleRange(20, 50);
@@ -26,20 +26,27 @@ string name = sub.TopStringDefault("Luna");
 sub = point.TopProperty("Material");
 double dens = sub.TopProperty("Density").TopDoubleDefault(100);
 
-Console.WriteLine(name + ": " + size + ", " + dens);*/
+Console.WriteLine(name + ": " + size + ", " + dens);
 
-/*pile.Save();
+pile.Save();
 
-Stockpile Updatever2 (Stockpile pile) {
+Stockpile Updatever2(Stockpile pile) {
 	pile.TopProperty("Moon").TopProperty("Name").TopString = "updated";
 	return pile;
 }*/
 
-string error;
-DataFile.Parse<Object>("./test.txt", print, out error);
+// Data File Testing
+
+string test = "";
+DataFile.Parse<Object>("./test.txt", print, out test);
+Console.WriteLine(test);
 
 static object? print (string[] test) {
-	Console.WriteLine(test);
+	foreach (string part in test) {
+		Console.Write("\"" + part + "\" ");
+	}
+
+	Console.WriteLine();
 
 	return null;
 }

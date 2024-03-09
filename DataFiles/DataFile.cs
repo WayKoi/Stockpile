@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Stockpile.DataFiles {
+namespace Piles.DataFiles {
     public static class DataFile {
         public static List<T?> Parse<T>(string path, Func<string[], T?> convert, out string error) {
             List<T?> parsed = new List<T?>();    
@@ -21,7 +21,7 @@ namespace Stockpile.DataFiles {
                 string line = lines[i].Trim();
 
                 // this whole line is a comment
-                if (line[0] == '#') { 
+                if (line.Length == 0 || line[0] == '#') { 
                     lines.RemoveAt(i); 
                     linecount--; 
                     i--;
@@ -43,26 +43,40 @@ namespace Stockpile.DataFiles {
                         if (chr == wait[waitCount - 1]) {
                             wait.RemoveAt(waitCount - 1);
                             waitCount--;
+                            continue;
                         }
                     } else {
                         if (chr == '\"') {
                             wait.Add(chr);
+                            waitCount++;
                             continue;
                         } else if (chr == '#') {
                             break;
-                        } else if (chr == ' ') {
-                            tokens.Add(build);
-                            build = "";
-                            continue;
-                        }   
+                        } else if (chr == ' ' || chr == '\t') {
+                            if (!build.Equals("")) {
+                                tokens.Add(build);
+                                build = "";
+                            }
+							continue;
+						}
                     }
 
                     build += chr;
                 }
+
+                if (!build.Equals("")) { tokens.Add(build); }
+
+                T? converted = convert(tokens.ToArray());
+                parsed.Add(converted);
             }
 
             error = "";
             return parsed;
         }
-    }
+
+		public static List<T?> Parse<T>(string path, Func<string[], T?> convert) {
+            string buff = "";
+            return Parse<T>(path, convert, out buff);
+        }
+	}
 }
