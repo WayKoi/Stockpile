@@ -5,16 +5,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.Serialization;
 using System.Text;
-using System.Threading.Tasks;
-using System.Web;
 
 namespace Piles {
 	public class Stockpile {
 		public string Path { get; set; } = string.Empty;
 		public string FileName { get; set; } = string.Empty;
 		public string FileExtension { get; set; } = string.Empty;
-		public Ver Version { get; set; } = new Ver();
-		public bool HasVersion { get; set; } = true;
 
 		protected Dictionary<string, List<Pile>> Collection = new Dictionary<string, List<Pile>>();
 
@@ -23,7 +19,7 @@ namespace Piles {
 			Path = path;
 		}
 
-		public void AddToCollection(Pile val) {
+		public void Add(Pile val) {
 			if (val == null) { return; }
 
 			if (!Collection.ContainsKey(val.Handle)) {
@@ -33,7 +29,7 @@ namespace Piles {
 			Collection[val.Handle].Add(val);
 		}
 
-		public void RemoveFromCollection(Pile val) {
+		public void Remove(Pile val) {
 			if (val == null) { return; }
 
 			if (Collection.ContainsKey(val.Handle)) {
@@ -62,10 +58,6 @@ namespace Piles {
 
 		public override string ToString() {
 			List<string> vals = new List<string>();
-
-			if (HasVersion) {
-				vals.Add(string.Format("Version: \"{0}.{1}.{2}\";\n", Version.Major, Version.Minor, Version.Patch));
-			}
 
 			foreach (KeyValuePair<string, List<Pile>> pair in Collection) {
 				foreach (Pile val in pair.Value) { 
@@ -113,7 +105,7 @@ namespace Piles {
 			return handle;
 		}
 
-		public static Stockpile Load(string path, bool versioned = true) {
+		public static Stockpile Load(string path) {
 			Stockpile file = new Stockpile();
 			if (!File.Exists(path)) { return file; }
 
@@ -128,24 +120,7 @@ namespace Piles {
 			foreach (string chunk in chunks) {
 				Pile? point = LoadPile(chunk);
 				if (point == null) { continue; }
-				file.AddToCollection(point);
-			}
-
-			file.HasVersion = versioned;
-			if (versioned) {
-				Pile point = file.TopProperty("Version");
-				string top = point.TopStringDefault("0.0.0");
-				string[] segs = top.Split('.');
-
-				if (segs.Length == 3) {
-					int major = 0, minor = 0, patch = 0;
-					int.TryParse(segs[0], out major);
-					int.TryParse(segs[1], out minor);
-					int.TryParse(segs[2], out patch);
-					file.Version.Set( (major, minor, patch));
-				}
-
-				file.RemoveFromCollection(point);
+				file.Add(point);
 			}
 
 			return file;
@@ -253,7 +228,7 @@ namespace Piles {
 				foreach (string chunk in chunks) {
 					Pile? coin = LoadPile(chunk);
 					if (coin == null) { continue; }
-					val.AddToCollection(coin);
+					val.Add(coin);
 				}
 			} else {
 				ParseValue(val, point);
@@ -266,13 +241,13 @@ namespace Piles {
 			if (toparse.Equals("null")) { return; }
 
 			if (toparse[0] == '\"') { // string
-				val.AddString = toparse.Replace("\"", "");
+				val.Add(toparse.Replace("\"", ""));
 			} else if (toparse.Equals("false") || toparse.Equals("true")) { // bool
-				val.AddBool = toparse.Equals("true");
+				val.Add(toparse.Equals("true"));
 			} else { // must be double
 				double doub = 0;
 				double.TryParse(toparse, out doub);
-				val.AddDouble = doub;
+				val.Add(doub);
 			}
 		}
 

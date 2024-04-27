@@ -2,9 +2,37 @@
 using Piles.Versioning;
 using Piles.DataFiles;
 
-string path = Directory.GetCurrentDirectory() + "\\test.stp";
 
-/*Stockpile pile = Stockpile.Load(path);
+Stockpile stock = Stockpile.Load("./Testing/Test.stp");
+
+Console.WriteLine(stock.ToString());
+
+List<Pile> props = stock.TopProperty("Test").Property("property");
+foreach (Pile pile in props) {
+	Console.Write(pile.ToString());
+}
+
+Console.WriteLine("\nPlanets\n");
+
+stock = Stockpile.Load("./Testing/Solar.stp");
+
+List<Pile> planets = stock.Property("planet");
+
+foreach (Pile planet in planets) {
+	Console.WriteLine("Name : " + planet.TopProperty("name").TopString);
+	Console.WriteLine("Size (Radius) : " + planet.TopProperty("size").TopDouble + "km");
+	Console.WriteLine("Terrestrial : " + planet.TopProperty("terrestrial").TopBool + "\n");
+}
+
+Console.WriteLine("The Star\n");
+
+Console.WriteLine("Name : " + stock.TopProperty("star").TopProperty("name").TopString);
+Console.WriteLine("Size (Radius) : " + stock.TopProperty("star").TopProperty("size").TopDouble + "km");
+
+
+/*string path = Directory.GetCurrentDirectory() + "\\test.stp";
+
+*//*Stockpile pile = Stockpile.Load(path);
 
 StockVersion.Connect(
 	"stp",
@@ -33,7 +61,7 @@ pile.Save();
 Stockpile Updatever2(Stockpile pile) {
 	pile.TopProperty("Moon").TopProperty("Name").TopString = "updated";
 	return pile;
-}*/
+}*//*
 
 // Data File Testing
 
@@ -49,4 +77,4 @@ static object? print (string[] test) {
 	Console.WriteLine();
 
 	return null;
-}
+}*/

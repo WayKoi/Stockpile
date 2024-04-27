@@ -18,7 +18,7 @@ namespace Piles.Versioning {
 			Nodes.Add(version, new UpdateNode(version));
 		}
 
-		public static void Connect (string ext, Ver start, Ver end, Func<Stockpile, Stockpile> update) {
+		public static void Connect (string ext, Ver start, Ver end, Func<VersionPile, VersionPile> update) {
 			if (!Trees.ContainsKey(ext)) {
 				Trees.Add(ext, new Dictionary<Ver, UpdateNode>());
 			}
@@ -31,13 +31,13 @@ namespace Piles.Versioning {
 			Nodes[start].Edges.Add(new UpdateEdge(Nodes[start], Nodes[end], update));
 		}
 
-		public static void Connect (string ext, ((int M, int m, int p) start, (int M, int m, int p) end, Func<Stockpile, Stockpile> update)[] tuples) {
-			foreach (((int M, int m, int p) start, (int M, int m, int p) end, Func<Stockpile, Stockpile> update) tuple in tuples) {
+		public static void Connect (string ext, ((int M, int m, int p) start, (int M, int m, int p) end, Func<VersionPile, VersionPile> update)[] tuples) {
+			foreach (((int M, int m, int p) start, (int M, int m, int p) end, Func<VersionPile, VersionPile> update) tuple in tuples) {
 				Connect(ext, new Ver(tuple.start), new Ver(tuple.end), tuple.update);
 			}
 		}
 
-		public static void Update (Stockpile pile, Ver end) {
+		public static void Update (VersionPile pile, Ver end) {
 			List<UpdateEdge> path = GetPath(pile.FileExtension, pile.Version, end);
 
 			foreach (UpdateEdge edge in path) {
@@ -48,7 +48,7 @@ namespace Piles.Versioning {
 			pile.Save();
 		}
 
-		public static void Update(Stockpile pile, (int M, int m, int p) end) {
+		public static void Update(VersionPile pile, (int M, int m, int p) end) {
 			Update(pile, new Ver(end));
 		}
 
@@ -132,62 +132,13 @@ namespace Piles.Versioning {
 
 	internal class UpdateEdge {
 		public UpdateNode Start, End;
-		public Func<Stockpile, Stockpile> Update;
+		public Func<VersionPile, VersionPile> Update;
 		public bool Traversed = false;
 
-		public UpdateEdge (UpdateNode start, UpdateNode end, Func<Stockpile, Stockpile> update) {
+		public UpdateEdge (UpdateNode start, UpdateNode end, Func<VersionPile, VersionPile> update) {
 			Start = start;
 			End = end;
 			Update = update;
-		}
-	}
-
-	public class Ver {
-		public int Major, Minor, Patch;
-
-		public Ver (int major = 0, int minor = 0, int patch = 0) {
-			Major = major;
-			Minor = minor;
-			Patch = patch;
-		}
-
-		public Ver((int major, int minor, int patch) tuple) {
-			Major = tuple.major;
-			Minor = tuple.minor;
-			Patch = tuple.patch;
-		}
-
-
-		public void Set ((int Major, int Minor, int Patch) version) {
-			Major = version.Major; 
-			Minor = version.Minor;
-			Patch = version.Patch;
-		}
-
-		public static bool operator == (Ver a, Ver b) {
-			return a.Major == b.Major && a.Minor == b.Minor && a.Patch == b.Patch;
-		}
-
-		public static bool operator != (Ver a, Ver b) {
-			return a.Major != b.Major || a.Minor != b.Minor || a.Patch != b.Patch;
-		}
-
-		public override bool Equals(object? obj) {
-			if (ReferenceEquals(this, obj)) {
-				return true;
-			}
-
-			if (ReferenceEquals(obj, null)) {
-				return false;
-			}
-
-			if (!(obj is Ver)) { return false; }
-
-			return this == (Ver) obj;
-		}
-
-		public override int GetHashCode() {
-			return Tuple.Create(Major, Minor, Patch).GetHashCode();
 		}
 	}
 }

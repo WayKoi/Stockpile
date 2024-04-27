@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Piles.DataFiles {
     public static class DataFile {
-        public static List<T?> Parse<T>(string path, Func<string[], T?> convert, out string error) {
+        public static List<T?> Parse<T>(string path, Func<string[], T?> convert, out string error, bool clipNulls = false) {
             List<T?> parsed = new List<T?>();    
 
             if (!File.Exists(path)) {
@@ -67,6 +67,7 @@ namespace Piles.DataFiles {
                 if (!build.Equals("")) { tokens.Add(build); }
 
                 T? converted = convert(tokens.ToArray());
+                if (clipNulls && converted == null) { continue; }
                 parsed.Add(converted);
             }
 
@@ -74,9 +75,9 @@ namespace Piles.DataFiles {
             return parsed;
         }
 
-		public static List<T?> Parse<T>(string path, Func<string[], T?> convert) {
+		public static List<T?> Parse<T>(string path, Func<string[], T?> convert, bool clipNulls = false) {
             string buff = "";
-            return Parse<T>(path, convert, out buff);
+            return Parse(path, convert, out buff, clipNulls);
         }
 	}
 }

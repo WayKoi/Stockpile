@@ -1,0 +1,46 @@
+planet: {
+	name: "Mercury";
+	size: 2440;
+	terrestrial: true;
+};
+planet: {
+	name: "Venus";
+	size: 6052;
+	terrestrial: true;
+};
+planet: {
+	name: "Earth";
+	size: 6371;
+	terrestrial: true;
+};
+planet: {
+	name: "Mars";
+	size: 3390;
+	terrestrial: true;
+};
+
+planet: {
+	name: "Jupiter";
+	size: 69911;
+	terrestrial: false;
+};
+planet: {
+	name: "Saturn";
+	size: 58362;
+	terrestrial: false;
+};
+planet: {
+	name: "Uranus";
+	size: 25362;
+	terrestrial: false;
+};
+planet: {
+	name: "Neptune";
+	size: 24622;
+	terrestrial: false;
+};
+
+star: {
+	name: "Sun";
+	size: 695500;
+};

@@ -1,73 +1,49 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel.Design.Serialization;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace Piles {
 	public class Pile {
 		private string _handle = string.Empty;
 		public string Handle {
 			get { return _handle; }
-			protected set {
+			private set {
 				_handle = Stockpile.StandardizeHandle(value);
 			}
 		}
 
-		protected List<string> Strings = new List<string>();
-		protected List<double> Doubles = new List<double>();
-		protected List<bool> Bools = new List<bool>();
+		private List<string> _strings = new List<string>();
+		private List<double> _doubles = new List<double>();
+		private List<bool> _bools = new List<bool>();
 
-		protected Dictionary<string, List<Pile>> Collection = new Dictionary<string, List<Pile>>();
-
-		public double AddDouble {
-			set {
-				if (Doubles == null) { Doubles = new List<double>(); }
-				Doubles.Add(value);
-			}
-		}
-
-		public string AddString {
-			set {
-				if (Strings == null) { Strings = new List<string>(); }
-				value = value.Replace("\"", "");
-				Strings.Add(value);
-			}
-		}
-
-		public bool AddBool {
-			set {
-				if (Bools == null) { Bools = new List<bool>(); }
-				Bools.Add(value);
-			}
-		}
+		private Dictionary<string, List<Pile>> _collection = new Dictionary<string, List<Pile>>();
 
 		public bool TopBool {
 			get {
-				if (Bools.Count == 0) { Bools.Add(false); }
-				return Bools[0];
+				if (_bools.Count == 0) { _bools.Add(false); }
+				return _bools[0];
 			}
 			set {
-				if (Bools.Count == 0) { Bools.Add(false); }
-				Bools[0] = value;
+				if (_bools.Count == 0) { _bools.Add(false); }
+				_bools[0] = value;
 			}
 		}
 
-		public bool[] AllBools {
+		public bool[] All_bools {
 			get {
-				return Bools.ToArray();
+				return _bools.ToArray();
 			}
 		}
 
 		public double TopDouble {
 			get {
-				if (Doubles.Count == 0) { Doubles.Add(0); }
-				return Doubles[0];
+				if (_doubles.Count == 0) { _doubles.Add(0); }
+				return _doubles[0];
 			}
 			set {
-				if (Doubles.Count == 0) { Doubles.Add(0); }
-				Doubles[0] = value;
+				if (_doubles.Count == 0) { _doubles.Add(0); }
+				_doubles[0] = value;
 			}
 		}
 
@@ -77,8 +53,8 @@ namespace Piles {
 		/// <param name="defaultValue"></param>
 		/// <returns>The top double</returns>
 		public double TopDoubleDefault (double defaultValue = 0) {
-			if (Doubles.Count == 0) { Doubles.Add(defaultValue); }
-			return Doubles[0];
+			if (_doubles.Count == 0) { _doubles.Add(defaultValue); }
+			return _doubles[0];
 		}
 
 		/// <summary>
@@ -89,25 +65,25 @@ namespace Piles {
 		/// <param name="high"></param>
 		/// <returns>The top double after being clamped</returns>
 		public double TopDoubleRange (double low, double high) {
-			if (Doubles.Count == 0) { Doubles.Add(low); }
-			Doubles[0] = Math.Min(Math.Max(Doubles[0], low), high);
-			return Doubles[0];
+			if (_doubles.Count == 0) { _doubles.Add(low); }
+			_doubles[0] = Math.Min(Math.Max(_doubles[0], low), high);
+			return _doubles[0];
 		}
 
-		public double[] AllDoubles {
+		public double[] All_doubles {
 			get {
-				return Doubles.ToArray();
+				return _doubles.ToArray();
 			}
 		}
 
 		public string TopString {
 			get {
-				if (Strings.Count == 0) { Strings.Add(string.Empty); }
-				return Strings[0];
+				if (_strings.Count == 0) { _strings.Add(string.Empty); }
+				return _strings[0];
 			}
 			set {
-				if (Strings.Count == 0) { Strings.Add(string.Empty); }
-				Strings[0] = value;
+				if (_strings.Count == 0) { _strings.Add(string.Empty); }
+				_strings[0] = value;
 			}
 		}
 
@@ -117,13 +93,13 @@ namespace Piles {
 		/// <param name="defaultValue"></param>
 		/// <returns>The top string</returns>
 		public string TopStringDefault (string defaultValue) {
-			if (Strings.Count == 0) { Strings.Add(defaultValue); }
-			return Strings[0];
+			if (_strings.Count == 0) { _strings.Add(defaultValue); }
+			return _strings[0];
 		}
 
-		public string[] AllStrings {
+		public string[] All_strings {
 			get {
-				return Strings.ToArray();
+				return _strings.ToArray();
 			}
 		}
 
@@ -131,25 +107,25 @@ namespace Piles {
 			Handle = handle;
 		}
 
-		public void ClearStrings() { Strings.Clear(); }
-		public void ClearDoubles() { Doubles.Clear(); }
-		public void ClearBools() { Bools.Clear(); }
-		public void ClearCollection() { Collection.Clear(); }
+		public void Clear_strings() { _strings.Clear(); }
+		public void Clear_doubles() { _doubles.Clear(); }
+		public void Clear_bools() { _bools.Clear(); }
+		public void Clear_collection() { _collection.Clear(); }
 
-		public void AddToCollection(Pile val) {
+		public void Add(Pile val) {
 			if (val == null) { return; }
-			if (!Collection.ContainsKey(val.Handle)) {
-				Collection.Add(val.Handle, new List<Pile>());
+			if (!_collection.ContainsKey(val.Handle)) {
+				_collection.Add(val.Handle, new List<Pile>());
 			}
 
-			Collection[val.Handle].Add(val);
+			_collection[val.Handle].Add(val);
 		}
 
 		public Pile TopProperty(string handle) {
 			handle = Stockpile.StandardizeHandle(handle);
-			if (!Collection.ContainsKey(handle)) { Collection.Add(handle, new List<Pile>()); }
+			if (!_collection.ContainsKey(handle)) { _collection.Add(handle, new List<Pile>()); }
 
-			List<Pile> point = Collection[handle];
+			List<Pile> point = _collection[handle];
 			if (point.Count == 0) { point.Add(new Pile(handle)); }
 
 			return point[0];
@@ -157,51 +133,67 @@ namespace Piles {
 
 		public List<Pile> Property(string handle) {
 			handle = Stockpile.StandardizeHandle(handle);
-			if (!Collection.ContainsKey(handle)) { Collection.Add(handle, new List<Pile>()); }
-			return Collection[handle];
+			if (!_collection.ContainsKey(handle)) { _collection.Add(handle, new List<Pile>()); }
+			return _collection[handle];
+		}
+
+		public void Add (double val) {
+			if (_doubles == null) { _doubles = new List<double>(); }
+			_doubles.Add(val);
+		}
+
+		public void Add(string val) {
+			if (_strings == null) { _strings = new List<string>(); }
+			val = val.Replace("\"", "");
+			_strings.Add(val);
+		}
+
+		public void Add(bool val) {
+			if (_bools == null) { _bools = new List<bool>(); }
+			_bools.Add(val);
 		}
 
 		public override string ToString() {
 			string build = "";
 			int count = 0;
 
-			if (Strings.Count > 0) {
-				foreach (string val in Strings) {
+			if (_strings.Count > 0) {
+				foreach (string val in _strings) {
 					build += (count > 0 ? ", " : "") + "\"" + val + "\"";
 					count++;
 				}
 			}
 
-			if (Doubles.Count > 0) {
-				foreach (double val in Doubles) {
+			if (_doubles.Count > 0) {
+				foreach (double val in _doubles) {
 					build += (count > 0 ? ", " : "") + val;
 					count++;
 				}
 			}
 
-			if (Bools.Count > 0) {
-				foreach (bool val in Bools) {
+			if (_bools.Count > 0) {
+				foreach (bool val in _bools) {
 					build += (count > 0 ? ", " : "") + val.ToString().ToLower();
 					count++;
 				}
 			}
 
-			if (Collection.Count > 0) {
+			if (_collection.Count > 0) {
 				string sub = (count > 0 ? ", " : "") + "{\n\t";
 
 				bool append = false;
-				List<string> collections = new List<string>();
-				foreach (KeyValuePair<string, List<Pile>> key in Collection) {
+				List<string> _collections = new List<string>();
+				foreach (KeyValuePair<string, List<Pile>> key in _collection) {
 					if (key.Value == null) { continue; }
 					foreach (Pile val in key.Value) {
 						if (val != null) {
-							collections.Add(val.ToString());
+							_collections.Add(val.ToString());
 							append = true;
 						}
 					}
 				}
 
-				foreach (string val in collections) {
+				foreach (string val in _collections) {
 					sub += val.Replace("\n", "\n\t");
 				}
 
