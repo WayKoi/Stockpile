@@ -8,7 +8,13 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Update="Testing\Data.dat">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="Testing\Solar.stp">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Testing\Test.sett">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Update="Testing\Test.stp">

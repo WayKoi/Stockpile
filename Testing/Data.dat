@@ -1,0 +1,10 @@
+# this is a file containing stock for items in a store
+# the format is
+# "<name>" "<description>" <cost> <stock> <perishable (true or false)>
+
+"Apple" "Fruit" 1.19 30 true
+"Orange" "Fruit" 1.80 20 true
+"Watermelon" "Fruit" 3.50 8 true
+
+"Barbecue" "Outdoor Equipment" 899.99 3 false
+Table Furniture 49.99 12 false

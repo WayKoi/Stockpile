@@ -16,12 +16,12 @@ namespace Piles.Utility {
 			return string.Join('/', chop);
 		}
 
-		public static string GetFileName(string path) {
+		public static string GetFileName(string path, bool withExt = false) {
 			path = path.Replace("\\", "/");
 			string[] chop = path.Split('/');
 
 			List<string> slice = chop[chop.Length - 1].Split('.').ToList();
-			if (slice.Count > 1) { slice.RemoveAt(slice.Count - 1); }
+			if (slice.Count > 1 && !withExt) { slice.RemoveAt(slice.Count - 1); }
 			
 			return String.Join(".", slice);
 		}

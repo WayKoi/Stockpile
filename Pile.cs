@@ -4,20 +4,18 @@ using System.Linq;
 using System.Text;
 
 namespace Piles {
-	public class Pile {
+	public class Pile : Pileable {
 		private string _handle = string.Empty;
 		public string Handle {
 			get { return _handle; }
 			private set {
-				_handle = Stockpile.StandardizeHandle(value);
+				_handle = StandardizeHandle(value);
 			}
 		}
 
 		private List<string> _strings = new List<string>();
 		private List<double> _doubles = new List<double>();
 		private List<bool> _bools = new List<bool>();
-
-		private Dictionary<string, List<Pile>> _collection = new Dictionary<string, List<Pile>>();
 
 		public bool TopBool {
 			get {
@@ -30,7 +28,7 @@ namespace Piles {
 			}
 		}
 
-		public bool[] All_bools {
+		public bool[] Bools {
 			get {
 				return _bools.ToArray();
 			}
@@ -66,11 +64,11 @@ namespace Piles {
 		/// <returns>The top double after being clamped</returns>
 		public double TopDoubleRange (double low, double high) {
 			if (_doubles.Count == 0) { _doubles.Add(low); }
-			_doubles[0] = Math.Min(Math.Max(_doubles[0], low), high);
+			_doubles[0] = Math.Clamp(_doubles[0], low, high);
 			return _doubles[0];
 		}
 
-		public double[] All_doubles {
+		public double[] Doubles {
 			get {
 				return _doubles.ToArray();
 			}
@@ -97,7 +95,7 @@ namespace Piles {
 			return _strings[0];
 		}
 
-		public string[] All_strings {
+		public string[] Strings {
 			get {
 				return _strings.ToArray();
 			}
@@ -110,32 +108,6 @@ namespace Piles {
 		public void Clear_strings() { _strings.Clear(); }
 		public void Clear_doubles() { _doubles.Clear(); }
 		public void Clear_bools() { _bools.Clear(); }
-		public void Clear_collection() { _collection.Clear(); }
-
-		public void Add(Pile val) {
-			if (val == null) { return; }
-			if (!_collection.ContainsKey(val.Handle)) {
-				_collection.Add(val.Handle, new List<Pile>());
-			}
-
-			_collection[val.Handle].Add(val);
-		}
-
-		public Pile TopProperty(string handle) {
-			handle = Stockpile.StandardizeHandle(handle);
-			if (!_collection.ContainsKey(handle)) { _collection.Add(handle, new List<Pile>()); }
-
-			List<Pile> point = _collection[handle];
-			if (point.Count == 0) { point.Add(new Pile(handle)); }
-
-			return point[0];
-		}
-
-		public List<Pile> Property(string handle) {
-			handle = Stockpile.StandardizeHandle(handle);
-			if (!_collection.ContainsKey(handle)) { _collection.Add(handle, new List<Pile>()); }
-			return _collection[handle];
-		}
 
 		public void Add (double val) {
 			if (_doubles == null) { _doubles = new List<double>(); }

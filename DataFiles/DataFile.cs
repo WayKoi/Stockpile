@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Piles.DataFiles {
     public static class DataFile {
-        public static List<T?> Parse<T>(string path, Func<string[], T?> convert, out string error, bool clipNulls = false) {
+        public static List<T?> Parse<T>(string path, Func<string[], T?> convert, out string error) {
             List<T?> parsed = new List<T?>();    
 
             if (!File.Exists(path)) {
@@ -67,7 +67,6 @@ namespace Piles.DataFiles {
                 if (!build.Equals("")) { tokens.Add(build); }
 
                 T? converted = convert(tokens.ToArray());
-                if (clipNulls && converted == null) { continue; }
                 parsed.Add(converted);
             }
 
@@ -75,9 +74,26 @@ namespace Piles.DataFiles {
             return parsed;
         }
 
-		public static List<T?> Parse<T>(string path, Func<string[], T?> convert, bool clipNulls = false) {
+		public static List<T?> Parse<T>(string path, Func<string[], T?> convert) {
             string buff = "";
-            return Parse(path, convert, out buff, clipNulls);
+            return Parse(path, convert, out buff);
+        }
+
+		public static List<T> ParseClean<T>(string path, Func<string[], T?> convert, out string error) {
+			List<T?> items = Parse(path, convert, out error);
+            List<T> cleaned = new List<T>();
+
+            foreach (T? item in items) {
+                if (item == null) { continue; }
+                cleaned.Add(item);
+            }
+
+            return cleaned;
+		}
+
+		public static List<T> ParseClean<T>(string path, Func<string[], T?> convert) {
+            string err = "";
+            return ParseClean(path, convert, out err);
         }
 	}
 }

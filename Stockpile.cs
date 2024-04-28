@@ -7,59 +7,32 @@ using System.Runtime.Serialization;
 using System.Text;
 
 namespace Piles {
-	public class Stockpile {
-		public string Path { get; set; } = string.Empty;
-		public string FileName { get; set; } = string.Empty;
-		public string FileExtension { get; set; } = string.Empty;
+	public class Stockpile : Pileable {
+		private string _directory = ".", _filename = "default.stock";
 
-		protected Dictionary<string, List<Pile>> Collection = new Dictionary<string, List<Pile>>();
-
-		public Stockpile (string? path = null) {
-			if (path == null) { path = string.Empty; }
-			Path = path;
+		public string SaveDirectory {
+			get { return _directory; }
+			set { _directory = value; }
 		}
 
-		public void Add(Pile val) {
-			if (val == null) { return; }
-
-			if (!Collection.ContainsKey(val.Handle)) {
-				Collection.Add(val.Handle, new List<Pile>());
-			}
-
-			Collection[val.Handle].Add(val);
+		public string FileName {
+			get { return _filename; }
+			set { _filename = value; }
 		}
 
-		public void Remove(Pile val) {
-			if (val == null) { return; }
-
-			if (Collection.ContainsKey(val.Handle)) {
-				Collection[val.Handle].Remove(val);
-				if (Collection[val.Handle].Count <= 0) {
-					Collection.Remove(val.Handle);
-				}
-			}
+		public string FullPath {
+			get { return string.Format("{0}/{1}", SaveDirectory, FileName); }
 		}
 
-		public Pile TopProperty(string handle) {
-			handle = StandardizeHandle(handle);
-			if (!Collection.ContainsKey(handle)) { Collection.Add(handle, new List<Pile>()); }
-
-			List<Pile> point = Collection[handle];
-			if (point.Count == 0) { point.Add(new Pile(handle)); }
-
-			return point[0];
-		}
-
-		public List<Pile> Property(string handle) {
-			handle = StandardizeHandle(handle);
-			if (!Collection.ContainsKey(handle)) { Collection.Add(handle, new List<Pile>()); }
-			return Collection[handle];
+		public Stockpile (string? dir = null, string? filename = null) {
+			if (dir != null) { SaveDirectory = dir; }
+			if (filename != null) { FileName = filename; }
 		}
 
 		public override string ToString() {
 			List<string> vals = new List<string>();
 
-			foreach (KeyValuePair<string, List<Pile>> pair in Collection) {
+			foreach (KeyValuePair<string, List<Pile>> pair in _collection) {
 				foreach (Pile val in pair.Value) { 
 					string? add = val.ToString();
 					if (add == null) { continue; }
@@ -70,48 +43,54 @@ namespace Piles {
 			return string.Join("", vals);
 		}
 
-		public void Save (string? path = null) {
-			path = GetFullPath(path);
+		/// <summary>
+		/// Saves the stockpile to the SaveDirectory with the file name FileName
+		/// </summary>
+		/// <param name="error"></param>
+		/// <returns>true if the save was successful and false if unsuccessful, more details will be found in the error string</returns>
+		public bool Save (out string error) {
+			if (!Directory.Exists(SaveDirectory)) {
+				error = "SaveDirectory \"" + SaveDirectory + "\" not found to be a directory";
+				return false;
+			}
 
-			if (path == string.Empty) { return; }
+			if (FileName.Equals(string.Empty)) {
+				error = "FileName not specfied, has an empty value";
+				return false;
+			}
+
+			string path = FullPath;
+
 			if (!File.Exists(path)) {
 				var create = File.Create(path);
 				create.Close();
 			}
 
 			File.WriteAllText(path, ToString());
+			
+			error = "";
+			return true;
 		}
 
-		public string GetFullPath (string? path) {
-			if (path == null) { path = Path; }
-			return string.Format("{0}/{1}.{2}", path, FileName, FileExtension);
+		/// <summary>
+		/// Saves the stockpile to the SaveDirectory with the file name FileName
+		/// </summary>
+		/// <returns>true if the save was successful and false if unsuccessful</returns>
+		public bool Save () {
+			string err;
+			return Save(out err);
 		}
 
 		// ----------------------------------------------
 		//  Static
 		// ----------------------------------------------
-		private static string BannedHandleChars = "[]{}\":;\n\t\r";
-		public static string StandardizeHandle(string handle) {
-			if (handle.Equals("")) { handle = "None"; return handle; }
-
-			handle = handle.Trim();
-
-			foreach (char single in BannedHandleChars) {
-				handle = handle.Replace(single + "", "");
-			}
-
-			handle = handle.Replace(" ", "-");
-
-			return handle;
-		}
 
 		public static Stockpile Load(string path) {
 			Stockpile file = new Stockpile();
 			if (!File.Exists(path)) { return file; }
 
-			file.Path = IO.GetFilePath(path);
-			file.FileName = IO.GetFileName(path);
-			file.FileExtension = IO.GetFileExtension(path);
+			file.SaveDirectory = IO.GetFilePath(path);
+			file.FileName = IO.GetFileName(path, true);
 
 			string content = File.ReadAllText(path);
 			content = content.Replace("\n", "").Replace("\t", "").Replace("\r", "");
@@ -126,7 +105,7 @@ namespace Piles {
 			return file;
 		}
 
-		protected static List<string> ChunkData(string content) {
+		private static List<string> ChunkData(string content) {
 			List<string> chunks = new List<string>();
 			List<char> wait = new List<char> {
 				';'
@@ -170,7 +149,7 @@ namespace Piles {
 			return chunks;
 		}
 
-		protected static Pile? LoadPile(string content) {
+		private static Pile? LoadPile(string content) {
 			string[] split = content.Split(new string[] { ": " }, 2, StringSplitOptions.None);
 			if (split.Length < 2) { return null; }
 			Pile val = new Pile(split[0]);
@@ -237,7 +216,7 @@ namespace Piles {
 			return val;
 		}
 
-		protected static void ParseValue(Pile val, string toparse) {
+		private static void ParseValue(Pile val, string toparse) {
 			if (toparse.Equals("null")) { return; }
 
 			if (toparse[0] == '\"') { // string
