@@ -121,7 +121,7 @@ namespace Piles.Testing {
 			return string.Format("\"{0}\" \"{1}\" {2} {3} {4}", Name, Description, Cost, Stock, Perishable);
 		}
 
-		// Thus functiion will turn the strings into the object
+		// This functiion will turn the strings into the object
 		public static Item? Parse(string[] parts) {
 			if (parts.Length < 5) { return null; }
 
