@@ -143,7 +143,7 @@ SettingsFile sett = SettingsFile.Load("./Testing/Test.sett");
 
 Every key value pair is read in as a string and can be interpreted as a string, double or bool
 
-```
+```C#
 string str = file.Search("key", "default");
 double num = file.Search("key", 10);
 bool truth = file.Search("key", false);
@@ -191,6 +191,8 @@ Comments can be done one of two ways
 # this is a comment that has its own line
 "this is data" 10 20 40 20 # this comment is at the end of a data line
 ```
+
+Next to give an example.
 
 The file below will be parsed using a parse function to turn each line into a class
 
